@@ -1,0 +1,2 @@
+from gym_connect4_twist_n_turn.envs.connect4_twist_n_turn_env import Connect4_TnT_Env
+# from gym_foo.envs.foo_extrahard_env import FooExtraHardEnv
