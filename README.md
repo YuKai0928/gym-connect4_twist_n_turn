@@ -1,7 +1,9 @@
 # gym-connect4_twist_n_turn
 This repo contains a gym environment of game "connect4 twist &amp; turns", which is a variety of origin game "connect 4"
 
+![](/Users/yukai/Documents/Sinica_intern/connect4_twist/gym-connect4_twist_n_turn/prototype.jpg)
 
+Pic source: [baordgamegeek](https://boardgamegeek.com/boardgame/199351/connect-4-twist-turn)
 
 ## Game Introduction
 
