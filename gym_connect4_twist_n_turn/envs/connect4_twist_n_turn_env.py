@@ -86,13 +86,7 @@ class Connect4_TnT_Env(gym.Env):
     self.board = np.zeros((self.width, self.height))
     self.current_player = 1 # Player 1 will move first.
     self.winner = None # -1/None/1/2
-    ## for debug
-    # self.board[0] = np.array([2,1,2,0,0])
-    # self.board[1] = np.array([2,1,0,0,0])
-    # self.board[2] = np.array([1,1,0,0,0])
-    # self.board[3] = np.array([2,1,0,0,0])
-    # self.board[4] = np.array([2,0,0,0,0])
-    # self.board[5] = np.array([1,0,0,0,0])
+    
     return self.get_player_observations()
   def render(self, mode='human'):
     s = ""
@@ -175,10 +169,22 @@ class Connect4_TnT_Env(gym.Env):
     """
     if self.winner is not None:
         return []
-    return [col for col in range(self.width) if self.board[col][self.height - 1] == 0],[i for i in range(2*self.height+1)]
+    moves = [[col for col in range(self.width) if self.board[col][self.height - 1] == 0],[0]]
+    for i in range(self.width):
+      rotatable = False
+      for j in range(self.height):
+        if self.board[i][j] != 0:
+          moves[1].append(i+1)
+          moves[1].append(self.height+i+1)
+          rotatable = True
+          break
+      if not rotatable:
+        break
+    return moves
 
   def filter_observation_player_perspective(self, player: int) -> List[np.ndarray]:
-    opponent = 1 if player == 2 else 1
+    opponent = 1 if player == 2 else 2
+
     # One hot channel encoding of the board
     empty_positions = np.where(self.board == 0, 1, 0)
     player_chips   = np.where(self.board == player, 1, 0)
