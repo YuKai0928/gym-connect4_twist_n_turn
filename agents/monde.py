@@ -45,8 +45,8 @@ def _monde(board,col,row,times = 1000):
             cur_player = 3 - cur_player
     print(f"MONDE: score = {score}")
     return score / times
-def y_on_board(y):
-    return y >= 0 and y < H
+def on_board(x,y):
+    return y >= 0 and y < H and x >=0 and x<W
 def player_win(board,me):
     for x in range(W):
         for y in range(H):
@@ -54,7 +54,7 @@ def player_win(board,me):
                 continue
             for (dx, dy) in [(0, +1), (+1, +1), (+1, 0), (+1, -1)]:
                 p = 1
-                while y_on_board(y+p*dy) and board[(x+p*dx)%W][y+p*dy] == me:
+                while on_board((x+p*dx)%W,y+p*dy) and board[(x+p*dx)%W][y+p*dy] == me:
                     p += 1
                     if p >= 4:
                         # print(f"Finished! winner is {me} at {x} {y} {dx} {dy}, {p=},{board=}")
