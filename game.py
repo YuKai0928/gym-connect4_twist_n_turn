@@ -8,7 +8,7 @@ env = gym.make('Connect4_Twist_n_Turn-v0') # default board size is height=5, wid
 obs = env.reset()
 done = False
 player = 0
-players = [RandomAgent(),MondeAgent()]
+players = [RandomAgent(),MondeAgent(100)]
 for i in players:
     i.game_starts(obs[0])
 legal_actions = env.get_moves()

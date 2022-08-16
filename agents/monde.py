@@ -24,23 +24,25 @@ def _monde(board,col,row,times = 1000):
     score = 0
     b_copy = board.copy()
     move_board(b_copy,col,row,1)
+    if player_win(b_copy,1):
+        print("winning move!",b_copy)
+        return times+1
     for _ in range(times):
         cur_player = 2
         b_simu = b_copy.copy()
         while True:
             valid_moves = get_moves(b_simu)
+            if len(valid_moves[0]) == 0:
+                break
+            col, row = [random.choice(valid_moves[0]),random.choice(valid_moves[1])]
+            move_board(b_simu,col,row,cur_player)
             if player_win(b_simu,1):
                 score+=1
                 break
             elif player_win(b_simu,2):
                 score-=1
                 break
-            elif len(valid_moves[0]) == 0:
-                break
-            col, row = [random.choice(valid_moves[0]),random.choice(valid_moves[1])]
-            move_board(b_simu,col,row,cur_player)
             cur_player = 3 - cur_player
-        del b_simu
     print(f"MONDE: score = {score}")
     return score / times
 def y_on_board(y):
@@ -50,13 +52,13 @@ def player_win(board,me):
         for y in range(H):
             if(board[x][y] != me): 
                 continue
-        for (dx, dy) in [(0, +1), (+1, +1), (+1, 0), (+1, -1)]:
-            p = 1
-            while y_on_board(y+p*dy) and board[(x+p*dx)%W][y+p*dy] == me:
-                p += 1
-            if p >= 4:
-            # print(f"Finished! winner is {me} at {x} {y} {dx} {dy}")
-                return True
+            for (dx, dy) in [(0, +1), (+1, +1), (+1, 0), (+1, -1)]:
+                p = 1
+                while y_on_board(y+p*dy) and board[(x+p*dx)%W][y+p*dy] == me:
+                    p += 1
+                if p >= 4:
+                    # print(f"Finished! winner is {me} at {x} {y} {dx} {dy}, {p=},{board=}")
+                    return True
     return False
 
 def move_board(board,col,row,me):
@@ -108,16 +110,20 @@ class MondeAgent():
         board = np.zeros((W,H))
     def make_move(self,obs,valid_moves):
         board = obs[1] + obs[2] * 2 # 1是自己 2是對手
-        # print(board)
+        print(board)
         value = -math.inf
         best_move = [random.choice(valid_moves[0]),random.choice(valid_moves[1])]
+        print("valid_moves",valid_moves)
         for col in valid_moves[0]:
             for row in valid_moves[1]:
                 cur_val = _monde(board,col,row,self.num_sample)
                 if cur_val > value:
                     best_move = [col,row]
                     value = cur_val
-        # print(f"return value is {value}")
+                if value > self.num_sample:
+                    print("found winning move",best_move)
+                    return best_move
+        print(f"return value is {value},move={best_move}")
         return best_move
 	
     def opponent_move(self,obs):

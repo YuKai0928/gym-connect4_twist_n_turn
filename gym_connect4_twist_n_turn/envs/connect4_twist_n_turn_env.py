@@ -170,10 +170,10 @@ class Connect4_TnT_Env(gym.Env):
     if self.winner is not None:
         return []
     moves = [[col for col in range(self.width) if self.board[col][self.height - 1] == 0],[0]]
-    for i in range(self.width):
+    for i in range(self.height):
       rotatable = False
-      for j in range(self.height):
-        if self.board[i][j] != 0:
+      for j in range(self.width):
+        if self.board[j][i] != 0:
           moves[1].append(i+1)
           moves[1].append(self.height+i+1)
           rotatable = True
