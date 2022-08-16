@@ -113,7 +113,7 @@ class MondeAgent():
         print(board)
         value = -math.inf
         best_move = [random.choice(valid_moves[0]),random.choice(valid_moves[1])]
-        print("valid_moves",valid_moves)
+        # print("valid_moves",valid_moves)
         for col in valid_moves[0]:
             for row in valid_moves[1]:
                 cur_val = _monde(board,col,row,self.num_sample)
@@ -121,9 +121,9 @@ class MondeAgent():
                     best_move = [col,row]
                     value = cur_val
                 if value > self.num_sample:
-                    print("found winning move",best_move)
+                    # print("found winning move",best_move)
                     return best_move
-        print(f"return value is {value},move={best_move}")
+        # print(f"return value is {value},move={best_move}")
         return best_move
 	
     def opponent_move(self,obs):
