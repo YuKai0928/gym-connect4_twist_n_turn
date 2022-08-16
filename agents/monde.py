@@ -56,9 +56,9 @@ def player_win(board,me):
                 p = 1
                 while y_on_board(y+p*dy) and board[(x+p*dx)%W][y+p*dy] == me:
                     p += 1
-                if p >= 4:
-                    # print(f"Finished! winner is {me} at {x} {y} {dx} {dy}, {p=},{board=}")
-                    return True
+                    if p >= 4:
+                        # print(f"Finished! winner is {me} at {x} {y} {dx} {dy}, {p=},{board=}")
+                        return True
     return False
 
 def move_board(board,col,row,me):
