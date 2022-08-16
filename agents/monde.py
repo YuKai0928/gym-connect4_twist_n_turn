@@ -96,8 +96,9 @@ def move_board(board,col,row,me):
 class MondeAgent():
     def __str__(self):
         return "Monde Agent"
-    def __init__(self):
-        pass
+    def __init__(self,num_sample = 1000):
+        self.num_sample = num_sample
+        self.sample_scheduler = None
     def game_starts(self,obs):
         # shape of obs is (3,width,height)
         global H
@@ -112,7 +113,7 @@ class MondeAgent():
         best_move = [random.choice(valid_moves[0]),random.choice(valid_moves[1])]
         for col in valid_moves[0]:
             for row in valid_moves[1]:
-                cur_val = _monde(board,col,row,100)
+                cur_val = _monde(board,col,row,self.num_sample)
                 if cur_val > value:
                     best_move = [col,row]
                     value = cur_val
