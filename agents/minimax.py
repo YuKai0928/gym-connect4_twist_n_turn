@@ -1,28 +1,68 @@
 import random
 import math
-
+import numpy as np
 board = None
 W = 0
 H = 0
-def _monde(obs):
-    score = 1
-    return score
-def y_on_board(y):
-    return y >= 0 and y < H
-def player_win(self, me):
+def board_rater(obs):
+    score = 0
     for x in range(W):
         for y in range(H):
-            if(board[x][y] != me): 
+            if(obs[x][y] == 1): 
+                p = 1
+                for (dx, dy) in [(0, +1), (+1, +1), (+1, 0), (+1, -1)]:
+                    while on_board((x+p*dx)%W,y+p*dy) and obs[(x+p*dx)%W][y+p*dy] == 1:
+                        p += 1
+                        if p == 2:
+                            score += 1
+                        if p == 3:
+                            score += 1
+                        if p == 4:
+                            score += 5
+                            break
+            elif(obs[x][y] == 2): 
+                p = 1
+                for (dx, dy) in [(0, +1), (+1, +1), (+1, 0), (+1, -1)]:
+                    while on_board((x+p*dx)%W,y+p*dy) and obs[(x+p*dx)%W][y+p*dy] == 2:
+                        p += 1
+                        if p == 2:
+                            score -= 1
+                        if p == 3:
+                            score -= 1
+                        if p == 4:
+                            score -= 5
+                            break
+    return score
+def on_board(x,y):
+    return y >= 0 and y < H and x >=0 and x<W
+def player_win(b, me):
+    for x in range(W):
+        for y in range(H):
+            if(b[x][y] != me): 
                 continue
-        for (dx, dy) in [(0, +1), (+1, +1), (+1, 0), (+1, -1)]:
-            p = 1
-            while y_on_board(y+p*dy) and board[(x+p*dx)%W][y+p*dy] == me:
-                p += 1
-            if p >= self.connect:
-            # print(f"Finished! winner is {me} at {x} {y} {dx} {dy}")
-                return True
+            for (dx, dy) in [(0, +1), (+1, +1), (+1, 0), (+1, -1)]:
+                p = 1
+                while on_board((x+p*dx)%W,y+p*dy) and  b[(x+p*dx)%W][y+p*dy] == me:
+                    p += 1
+                    if p >= 4:
+                        return True
     return False
-
+def get_moves(B):
+    """
+    :returns: array with all possible moves, index of columns which aren't full and available rotation operation number
+    """
+    moves = [[col for col in range(W) if B[col][H - 1] == 0],[0]]
+    for i in range(W):
+        rotatable = False
+        for j in range(H):
+            if B[i][j] != 0:
+                moves[1].append(i+1)
+                moves[1].append(H+i+1)
+                rotatable = True
+                break
+        if not rotatable:
+            break
+    return moves
 def move_board(board,col,row,me):
     for i in range(H):
         if board[col][i] == 0:
@@ -57,32 +97,35 @@ def move_board(board,col,row,me):
                 board[i][j] = 0
 
 
-def minimax(board, alpha, beta, maximizing_player,valid_moves):
+def minimax(board, depth, alpha, beta, maximizing_player):
+    valid_moves = get_moves(board)
+    if(depth == 4):
+        print(depth, alpha, beta, maximizing_player)
+    if player_win(board,1):
+        # print("A")
+        return (None,100000)
+    elif player_win(board,2):
+        # print("B")
+        return (None,-100000)
 
-    if player_win(1):
-        return (None, 1)
-    elif player_win(2):
-        return (None, -1)
     elif len(valid_moves[0]) == 0:
-        return (None, 0)
+        # print("C")
+        return (None,0)
+    elif depth == 0:
+        return (None,board_rater(board))
 
     if maximizing_player:
 
         # initial value is what we do not want - negative infinity
         value = -math.inf
-        ret_value = 0
         best_move = [random.choice(valid_moves[0]),random.choice(valid_moves[1])]
 
-        # for every valid column, we simulate dropping a piece with the help of a board copy
-        # and run the minimax on it with decresed depth and switched player
         for col in valid_moves[0]:
             for row in valid_moves[1]:
                 b_copy = board.copy()
-                drop_piece(b_copy, col, row, 1)
-                # recursive call
-                new_score = minimax(b_copy, alpha, beta, False)[1]
+                move_board(b_copy, col, row, 1)
+                new_score = minimax(b_copy, depth-1, alpha, beta, False)[1]
                 # if the score for this column is better than what we already have
-                ret_value += new_score
                 if new_score > value:
                     value = new_score
                     best_move = [col,row]
@@ -94,18 +137,17 @@ def minimax(board, alpha, beta, maximizing_player,valid_moves):
                     break
             if alpha >= beta:
                 break
-        ret_value /= (len(valid_moves[0]) * len(valid_moves[1]))
-        return best_move, ret_value
-    else: # for thte minimizing player
+        # print("1",best_move,depth)
+        return best_move, value
+    else: # for the minimizing player
         value = math.inf
-        ret_value = 0
+
         best_move = [random.choice(valid_moves[0]),random.choice(valid_moves[1])]
         for col in valid_moves[0]:
             for row in valid_moves[1]:
                 b_copy = board.copy()
-                drop_piece(b_copy, col, row, 2)
-                new_score = minimax(b_copy, alpha, beta, True)[1]
-                ret_value += new_score
+                move_board(b_copy, col, row, 2)
+                new_score = minimax(b_copy, depth-1, alpha, beta, True)[1]
                 if new_score < value:
                     value = new_score
                     best_move = [col,row]
@@ -114,22 +156,29 @@ def minimax(board, alpha, beta, maximizing_player,valid_moves):
                     break
             if alpha >= beta:
                 break
-        return column, ret_value
+        # print("2",best_move,depth)
+        return best_move, value
     
-class RandomAgent():
-	def __init__(self):
-		pass
-	def game_starts(self,obs):
+class MinimaxAgent():
+    def __str__(self):
+        return "MinimaxAgent"
+    def __init__(self,depth):
+        self.depth = depth
+    def game_starts(self,obs):
         # shape of obs is (3,width,height)
+        global W
+        global H
         W = len(obs[0])
         H = len(obs[0][0])
-		board = np.zeros((W,H))
-	def make_move(self,obs,valid_moves):
+        board = np.zeros((W,H))
+    def make_move(self,obs,valid_moves):
         board = obs[1] + obs[2] * 2 # 1是自己 2是對手
-        move, ret_val = minimax(board, 5, -math.inf, math.inf, True, valid_moves)
-        print(f"return value is {ret_val}")
-		return move
-	def opponent_move(self,obs):
-		pass
-	def game_terminates(self,reward):
-		pass
+        # best_move = [random.choice(valid_moves[0]),random.choice(valid_moves[1])]
+        move = minimax(board, self.depth, -math.inf, math.inf, True)[0]
+        
+        # print(f"return move {move}")
+        return move
+    def opponent_move(self,obs):
+        pass
+    def game_terminates(self,reward):
+        pass

@@ -4,11 +4,12 @@ import random
 from agents.random import RandomAgent
 from agents.human import HumanAgent
 from agents.monde import MondeAgent
+from agents.minimax import MinimaxAgent
 env = gym.make('Connect4_Twist_n_Turn-v0') # default board size is height=5, width=6
 obs = env.reset()
 done = False
 player = 0
-players = [RandomAgent(),MondeAgent(100)]
+players = [RandomAgent(),MinimaxAgent(3)]
 for i in players:
     i.game_starts(obs[0])
 legal_actions = env.get_moves()
