@@ -7,10 +7,7 @@ from typing import List
 from copy import deepcopy
 import numpy as np
 
-class Connect4_TnT_Env(gym.Env):
-  metadata = {'render.modes': ['human']}
-
-  """
+"""
   get 4 of your colored discs in a row (horizontally/vertically/diagonally)
   board: 0 for empty, 1 for disc of P1, 2 for disc of P2
   y
@@ -26,6 +23,10 @@ class Connect4_TnT_Env(gym.Env):
     e.g. 3 => rotate the 4th layer Counter Clock Wise
   self.winner = None(gaming) / 1 / 2 / -1(draw)
   """
+class Connect4_TnT_Env(gym.Env):
+  metadata = {'render.modes': ['human']}
+
+  
   def __init__(self,width=6, height=5, connect=4,render_mode='human'):
     self.width = width
     self.height = height
@@ -81,7 +82,6 @@ class Connect4_TnT_Env(gym.Env):
             'current_player': self.current_player}
     self.current_player = 2 if self.current_player == 1 else 1
     return self.get_player_observations(), reward_vector, self.winner is not None, info
-
   def reset(self):
     self.board = np.zeros((self.width, self.height))
     self.current_player = 1 # Player 1 will move first.
@@ -96,7 +96,6 @@ class Connect4_TnT_Env(gym.Env):
             s += Fore.RESET
         s += "\n"
     print(s)
-
   def close(self):
     pass
 
